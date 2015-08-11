@@ -2,7 +2,6 @@ import json
 from hqlib.rabbitmq import ExchangeType
 import logging
 from pika.exceptions import AMQPConnectionError
-import threading
 
 
 class Publisher(object):
@@ -18,7 +17,7 @@ class Publisher(object):
         
     def publishersetup(self):
 
-        tries = self.rabbitmq.connectionParams
+        tries = len(self.rabbitmq.connectionParams)
 
         try:
             self.connection = self.rabbitmq.syncconnection()
