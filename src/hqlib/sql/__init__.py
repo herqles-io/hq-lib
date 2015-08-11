@@ -43,4 +43,5 @@ class SQLDB(object):
         try:
             yield session
         finally:
-            scoped_session(sessionmaker()).remove()
+            session.close()
+            session.remove()
