@@ -51,11 +51,11 @@ class Daemon(object):
         signal.signal(signal.SIGTERM, self.on_shutdown)
         signal.signal(signal.SIGABRT, self.on_shutdown)
 
-        if not self.run():
-            sys.exit(1)
-
         with open(self.get_pid_file(), "w") as f:
             f.write(str(os.getpid()))
+
+        if not self.run():
+            self.stop()
 
         while True:
             threads = threading.enumerate()

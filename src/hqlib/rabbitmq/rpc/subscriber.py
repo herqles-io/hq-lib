@@ -21,6 +21,6 @@ class RPCSubscriber(QueueSubscriber):
             else:
                 self.logger.warning("Duplicate rpc correlation_id " + properties.correlation_id)
         else:
-            self.logger.warning("Unknown rpc correlation_id " + properties.correlation_id + "with data " + body)
+            self.logger.warning("Unknown rpc correlation_id " + properties.correlation_id + " with data " + body)
 
         channel.basic_ack(basic_deliver.delivery_tag)
