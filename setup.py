@@ -3,11 +3,10 @@ from setuptools import setup, find_packages
 setup(
     name='hq-lib',
     version='1.0.0',
-    url='',
+    url='https://github.com/herqles-io/hq-lib',
     include_package_data=True,
     license='MIT',
-    author='Ryan Belgrave',
-    author_email='rbelgrave@covermymeds.com',
+    author='CoverMyMeds',
     description='Herqles Library',
     package_dir={'': 'src'},
     packages=find_packages('src'),
