@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='hq-lib',
-    version='1.0.0',
+    version='2.0.0-dev',
     url='https://github.com/herqles-io/hq-lib',
     include_package_data=True,
     license='MIT',
