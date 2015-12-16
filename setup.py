@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='hq-lib',
-    version='1.0.0',
+    version='1.0.1',
     url='https://github.com/herqles-io/hq-lib',
     include_package_data=True,
     license='MIT',
@@ -14,6 +14,8 @@ setup(
         'pika==0.9.14',
         'enum34==1.0.4',
         'sqlalchemy==1.0.8',
+        'schematics==1.0.4',
+        'pyyaml==3.11',
     ],
     extras_require={
         'ldap': ['python-ldap==2.4.*']
