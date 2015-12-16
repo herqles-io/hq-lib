@@ -4,6 +4,7 @@ import tempfile
 from unittest import TestCase, TestLoader, TextTestRunner
 
 from hqlib.config import parse_config
+from hqlib.config.base_config import BaseConfig
 from hqlib.config.error import HerqlesConfigError
 
 
@@ -48,45 +49,71 @@ VALID_YAML = """---
     bind_username: admin
     bind_password: "admin_test_pwd" """
 
-INVALID_YAML = """---
+INCOMPLETE_YAML = """---
   rabbitmq:
-    hosts
-    - "localhost:5672"
-    - "testhost:5672"
+    hosts:
+      - "localhost:5672"
+      - "testhost:5672"
     username: herqles
     password: herqles
-    virtual_host: herqles"""
+    virtual_host: herqles """
 
-class TestParseConfig(TestCase):
+class TestBaseConfig(TestCase):
 
-    def test_missing_file_error_handling(self):
-        """ Missing config file should raise HerqlesConfigError """
-
-        with self.assertRaises(HerqlesConfigError) as hce:
-            parse_config('bogus_filename')
-
-        self.assertTrue(str(hce.exception).startswith('Could not load config file: '))
-
-    def test_parse_config_file_load(self):
-
+    def test_base_config_loading(self):
+    
         with tempfile.NamedTemporaryFile() as temp_config_file:
             temp_config_file.write(VALID_YAML)
             temp_config_file.flush()
 
-            parse_config(temp_config_file.name)
+            base_config_data = parse_config(temp_config_file.name)
 
-    def test_config_file_load_failure(self):
+            base_config = BaseConfig(base_config_data)
 
+            base_config.validate()
+
+    def test_base_config_data(self):
+    
         with tempfile.NamedTemporaryFile() as temp_config_file:
-            temp_config_file.write(INVALID_YAML)
+            temp_config_file.write(VALID_YAML)
             temp_config_file.flush()
 
-            with self.assertRaises(HerqlesConfigError) as hce:
-                parse_config(temp_config_file.name)
+            base_config_data = parse_config(temp_config_file.name)
 
-            self.assertTrue(str(hce.exception).startswith('Could not parse config file: '))
+            base_config = BaseConfig(base_config_data)
+
+            base_config.validate()
+
+            correct_paths_data = {
+                'logs': '/var/log/herqles',
+                'pid': '/var/run/herqles/hq-manager.pid'
+            }
+
+            self.assertEqual(correct_paths_data, base_config.paths)
+
+            incorrect_paths_data = {
+                'logs': '/something/very/very/wrong',
+                'pid': '/var/run/herqles/hq-manager.pid'
+            }
+
+            self.assertNotEqual(incorrect_paths_data, base_config.paths)
+
+    def test_incomplete_base_config_data(self):
+    
+        with tempfile.NamedTemporaryFile() as temp_config_file:
+            temp_config_file.write(INCOMPLETE_YAML)
+            temp_config_file.flush()
+
+            base_config_data = parse_config(temp_config_file.name)
+
+            with self.assertRaises(HerqlesConfigError) as hce:
+                base_config = BaseConfig(base_config_data)
+
+                base_config.validate()
+
+            self.assertTrue(str(hce.exception).startswith('Could not validate base config: '))
 
 
 if __name__ == '__main__':
     TextTestRunner(verbosity=2).run(
-        TestLoader().loadTestsFromTestCase(TestParseConfig))
+        TestLoader().loadTestsFromTestCase(TestBaseConfig))
