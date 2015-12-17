@@ -7,61 +7,14 @@ from hqlib.config import parse_config
 from hqlib.config.base_config import BaseConfig
 from hqlib.config.error import HerqlesConfigError
 
+from tests.shared_data import VALID_YAML, INCOMPLETE_YAML
 
-VALID_YAML = """---
-  rabbitmq:
-    hosts:
-      - "localhost:5672"
-      - "testhost:5672"
-    username: herqles
-    password: herqles
-    virtual_host: herqles
-  sql:
-    driver: postgres
-    host: localhost
-    port: 5432
-    database: herqles
-    username: herqles
-    password: herqles
-    pool_size: "20"
-  identity:
-    driver: hqmanager.identity.ldap_driver
-  assignment:
-    mapping:
-      "CN=sys_linuxadmins,OU=System Access,OU=Administrative Groups":
-        - "herqles.*"
-      "CN=Autobahn,OU=Administrative Groups":
-        - herqles.task.get
-        - herqles.framework.cd_stage.create
-        - herqles.framework.cd_stage.get
-        - herqles.framework.cd_deploy.create
-        - herqles.framework.cd_deploy.get
-        - herqles.framework.cd_rollback.create
-        - herqles.framework.cd_rollback.get
-    driver: hqmanager.assignment.ldap_driver
-  paths:
-    logs: /var/log/herqles
-    pid: /var/run/herqles/hq-manager.pid
-  ldap:
-    host: localhost
-    domain: local
-    base_dn: "DC=test,DC=local"
-    bind_username: admin
-    bind_password: "admin_test_pwd" """
-
-INCOMPLETE_YAML = """---
-  rabbitmq:
-    hosts:
-      - "localhost:5672"
-      - "testhost:5672"
-    username: herqles
-    password: herqles
-    virtual_host: herqles """
 
 class TestBaseConfig(TestCase):
 
     def test_base_config_loading(self):
-    
+        """ Config data loads and validates """
+
         with tempfile.NamedTemporaryFile() as temp_config_file:
             temp_config_file.write(VALID_YAML)
             temp_config_file.flush()
@@ -73,7 +26,8 @@ class TestBaseConfig(TestCase):
             base_config.validate()
 
     def test_base_config_data(self):
-    
+        """ Proper config data loads, is present and is accurate """
+
         with tempfile.NamedTemporaryFile() as temp_config_file:
             temp_config_file.write(VALID_YAML)
             temp_config_file.flush()
@@ -98,8 +52,9 @@ class TestBaseConfig(TestCase):
 
             self.assertNotEqual(incorrect_paths_data, base_config.paths)
 
-    def test_incomplete_base_config_data(self):
-    
+    def test_incomplete_config_data(self):
+        """ Incomplete config data raises HerqlesConfigError """
+
         with tempfile.NamedTemporaryFile() as temp_config_file:
             temp_config_file.write(INCOMPLETE_YAML)
             temp_config_file.flush()
