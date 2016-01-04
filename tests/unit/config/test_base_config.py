@@ -69,6 +69,7 @@ class TestBaseConfig(TestCase):
 
         with self.assertRaises(HerqlesConfigError) as hce:
             base_config = BaseConfig(base_config_data)
+            sql = base_config.sql
             hosts = base_config.rabbitmq.hosts
 
         self.assertTrue(str(hce.exception).startswith('RabbitMQ configuration missing'))

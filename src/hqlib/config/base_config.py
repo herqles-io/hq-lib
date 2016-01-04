@@ -78,8 +78,8 @@ class BaseConfig(object):
     def validate(self):
         """ Validate and throw more succinct error """
 
-        for sub_config in ['rabbitmq', 'sql', 'ldap', 'paths']:
-            if getattr(self, sub_config):
+        for sub_config in CONFIG_SECTIONS:
+            if hasattr(self, sub_config):
                 getattr(self, sub_config).validate()
 
 def generate_default_config_file(filename='config.yml', config_directory='./'):
