@@ -43,30 +43,54 @@ class TestBaseConfig(TestCase):
                 'pid': '/var/run/herqles/hq-manager.pid'
             }
 
-            self.assertEqual(correct_paths_data, base_config.paths)
+            self.assertEqual(correct_paths_data['logs'], base_config.paths.logs)
 
             incorrect_paths_data = {
                 'logs': '/something/very/very/wrong',
                 'pid': '/var/run/herqles/hq-manager.pid'
             }
 
-            self.assertNotEqual(incorrect_paths_data, base_config.paths)
+            self.assertNotEqual(incorrect_paths_data['logs'], base_config.paths.logs)
 
-    def test_incomplete_config_data(self):
+    def test_missing_config(self):
         """ Incomplete config data raises HerqlesConfigError """
 
-        with tempfile.NamedTemporaryFile() as temp_config_file:
-            temp_config_file.write(INCOMPLETE_YAML)
-            temp_config_file.flush()
+        base_config_data = {
+            'sql': {
+                "driver": "postgres",
+                "host": "localhost",
+                "port": "5432",
+                "database": "herqles",
+                "username": "herqles",
+                "password": "herqles",
+                "pool_size": "20",
+            }
+        }
 
-            base_config_data = parse_config(temp_config_file.name)
+        with self.assertRaises(HerqlesConfigError) as hce:
+            base_config = BaseConfig(base_config_data)
+            hosts = base_config.rabbitmq.hosts
 
-            with self.assertRaises(HerqlesConfigError) as hce:
-                base_config = BaseConfig(base_config_data)
+        self.assertTrue(str(hce.exception).startswith('RabbitMQ configuration missing'))
 
-                base_config.validate()
+    def test_config_validation(self):
+        """ Incomplete config data raises HerqlesConfigError """
 
-            self.assertTrue(str(hce.exception).startswith('Could not validate base config: '))
+        base_config_data = {
+            'rabbitmq': {
+                'hosts': ['localhost:5672', 'testhost:5672'],
+                'username': 'herqles',
+                'virtual_host': 'herqles',
+            }
+        }
+
+        with self.assertRaises(HerqlesConfigError) as hce:
+            base_config = BaseConfig(base_config_data)
+
+            base_config.validate()
+
+        err_msg = 'Could not validate rabbitmq config: {"password": ["This field is required."]}'
+        self.assertEqual(str(hce.exception), err_msg)
 
 
 if __name__ == '__main__':

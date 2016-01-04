@@ -30,6 +30,25 @@ class TestLDAPConfig(TestCase):
 
             ldap_config.validate()
 
+    def test_missing_field_loading_from_base_config(self):
+        """ Config data loads and validates """
+
+        with tempfile.NamedTemporaryFile() as temp_config_file:
+            temp_config_file.write(VALID_YAML)
+            temp_config_file.flush()
+
+            base_config_data = parse_config(temp_config_file.name)
+
+            base_config_data['ldap'].pop('host')
+
+            base_config = BaseConfig(base_config_data)
+
+        with self.assertRaises(HerqlesConfigError) as hce:
+
+            base_config.validate()
+
+        self.assertTrue(str(hce.exception).startswith('Could not validate LDAP config: '))
+
     def test_loading_from_dict(self):
         """ Config data loads and validates """
 
