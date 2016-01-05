@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import yaml
+
 from hqlib.config.error import HerqlesConfigError
 from hqlib.config.ldap_config import LDAPConfig
 from hqlib.config.path_config import PathConfig
@@ -12,6 +14,7 @@ CONFIG_SECTIONS = {
     'sql': SQLConfig,
     'paths': PathConfig,
 }
+
 
 class BaseConfig(object):
     """ Validation for Herqles framwork configuration
@@ -88,4 +91,37 @@ def generate_default_config_file(filename='config.yml', config_directory='./'):
     Generate a basic config yaml file with default values filled in
 
     """
-    pass
+
+    test_data = {
+        'rabbitmq': {
+            'hosts': ['localhost:5672', 'testhost:5672'],
+            'username': 'herqles',
+            'virtual_host': 'herqles',
+        },
+        'sql': {
+            'driver': 'postgres',
+            'host': 'localhost',
+            'port': 5432,
+            'database': 'herqles',
+            'username': 'herqles',
+            'password': 'herqles',
+            'pool_size': 20,
+        },
+        'ldap': {
+            'host': 'localhost',
+            'domain': 'local',
+            'base_dn': 'DC=test,DC=local',
+            'bind_username': 'admin',
+            'bind_password': 'admin_test_pwd',
+        },
+        'paths': {
+            'logs': '/var/log/herqles',
+            'pid': '/var/run/herqles/hq-manager.pid'
+        }
+    }
+
+    with open(config_directory + filename, 'w') as config_file:
+        yaml.dump(test_data, config_file, default_flow_style=False)
+
+if __name__ == '__main__':
+    generate_default_config_file()
