@@ -10,14 +10,14 @@ Base = declarative_base()
 
 class SQLDB(object):
 
-    def __init__(self, driver, host, port, database, username, password, pool_size):
-        self.driver = driver
-        self.host = host
-        self.port = port
-        self.database = database
-        self.username = username
-        self.password = password
-        self.pool_size = pool_size
+    def __init__(self, sql_config):
+        self.driver = sql_config.driver
+        self.host = sql_config.host
+        self.port = sql_config.port
+        self.database = sql_config.database
+        self.username = sql_config.username
+        self.password = sql_config.password
+        self.pool_size = sql_config.pool_size
         self.engine = None
 
     def connect(self):
@@ -29,7 +29,9 @@ class SQLDB(object):
             'password': self.password,
             'database': self.database
         }
-        self.engine = create_engine(URL(**database), poolclass=QueuePool, pool_size=self.pool_size)
+        self.engine = create_engine(URL(**database),
+                                    poolclass=QueuePool,
+                                    pool_size=self.pool_size)
 
     @contextmanager
     def session(self):

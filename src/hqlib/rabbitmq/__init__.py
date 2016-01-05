@@ -7,11 +7,16 @@ SelectPoller.TIMEOUT = 0.01
 
 class RabbitMQ(object):
 
-    def __init__(self, hosts, username, password, virtualhost):
-        self.hosts = hosts
-        self.username = username
-        self.password = password
-        self.virtualhost = virtualhost
+    def __init__(self, rabbitmq_config):
+
+        self.hosts = []
+        for host in rabbitmq_config.hosts:
+            (ip, port) = host.split(":")
+            self.hosts.append((ip, int(port)))
+
+        self.username = rabbitmq_config.username
+        self.password = rabbitmq_config.password
+        self.virtualhost = rabbitmq_config.virtualhost
         self.connectionParams = []
         self.paramIndex = 0
         self.active_subscribers = []

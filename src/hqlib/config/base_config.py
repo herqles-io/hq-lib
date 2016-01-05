@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import yaml
 
+from hqlib.config import parse_config
 from hqlib.config.error import HerqlesConfigError
 from hqlib.config.ldap_config import LDAPConfig
 from hqlib.config.path_config import PathConfig
@@ -28,6 +29,8 @@ class BaseConfig(object):
 
     def __init__(self, config_data):
         """ Init using the config_data """
+
+        self.config_data = config_data
 
         for section_key in CONFIG_SECTIONS:
             if section_key in config_data:
@@ -84,6 +87,15 @@ class BaseConfig(object):
         for sub_config in CONFIG_SECTIONS:
             if hasattr(self, sub_config):
                 getattr(self, sub_config).validate()
+
+def base_from_config_file(config_filename):
+    """ Generate base_config from yml filename """
+
+    base_config = BaseConfig(parse_config(config_filename))
+    base_config.validate()
+
+    return base_config
+
 
 def generate_default_config_file(filename='config.yml', config_directory='./'):
     """Create a properly structured config file
