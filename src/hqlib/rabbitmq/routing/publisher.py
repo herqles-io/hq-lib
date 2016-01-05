@@ -17,7 +17,7 @@ class Publisher(object):
         
     def publishersetup(self):
 
-        tries = len(self.rabbitmq.connectionParams)
+        tries = len(self.rabbitmq.connection_params)
 
         try:
             self.connection = self.rabbitmq.syncconnection()

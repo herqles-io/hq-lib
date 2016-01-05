@@ -17,18 +17,18 @@ class RabbitMQ(object):
         self.username = rabbitmq_config.username
         self.password = rabbitmq_config.password
         self.virtualhost = rabbitmq_config.virtualhost
-        self.connectionParams = []
-        self.paramIndex = 0
+        self.connection_params = []
+        self.param_index = 0
         self.active_subscribers = []
         self.active_publishers = []
 
     def setup_database(self):
         credentials = pika.PlainCredentials(username=self.username, password=self.password)
         for host in self.hosts:
-            self.connectionParams.append(pika.ConnectionParameters(host=host[0], port=host[1],
+            self.connection_params.append(pika.ConnectionParameters(host=host[0], port=host[1],
                                                                    virtual_host=self.virtualhost,
                                                                    credentials=credentials))
-        self.paramIndex = 0
+        self.param_index = 0
 
     def add_publisher(self, publisher):
         self.active_publishers.append(publisher)
@@ -44,16 +44,16 @@ class RabbitMQ(object):
 
     def syncconnection(self, reconnect=False):
         if reconnect:
-            self.paramIndex += 1
-            if self.paramIndex >= len(self.connectionParams):
-                self.paramIndex = 0
-        return pika.BlockingConnection(parameters=self.connectionParams[self.paramIndex])
+            self.param_index += 1
+            if self.param_index >= len(self.connection_params):
+                self.param_index = 0
+        return pika.BlockingConnection(parameters=self.connection_params[self.param_index])
 
     def asyncconnection(self, callback, reconnect=False):
         if reconnect:
-            self.paramIndex += 1
-            if self.paramIndex >= len(self.connectionParams):
-                self.paramIndex = 0
-        connection = pika.SelectConnection(parameters=self.connectionParams[self.paramIndex],
+            self.param_index += 1
+            if self.param_index >= len(self.connection_params):
+                self.param_index = 0
+        connection = pika.SelectConnection(parameters=self.connection_params[self.param_index],
                                            on_open_callback=callback, stop_ioloop_on_close=False)
         return connection

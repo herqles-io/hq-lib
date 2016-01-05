@@ -88,7 +88,7 @@ class BaseConfig(object):
             if hasattr(self, sub_config):
                 getattr(self, sub_config).validate()
 
-def base_from_config_file(config_filename):
+def base_config_from_file(config_filename):
     """ Generate base_config from yml filename """
 
     base_config = BaseConfig(parse_config(config_filename))
