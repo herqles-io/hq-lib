@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import pika
-from hqlib.rabbitmq.exchangetype import ExchangeType
 from pika.adapters.select_connection import SelectPoller
+
+from hqlib.rabbitmq.exchangetype import ExchangeType
 
 SelectPoller.TIMEOUT = 0.01
 
